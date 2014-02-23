@@ -1,0 +1,27 @@
+uses
+	CtrlLib;
+
+file
+	PawnColor.h,
+	Pawn.h,
+	Pawn.cpp,
+	SingleMove.h,
+	SingleMove.cpp,
+	Move.h,
+	Move.cpp,
+	Position.h,
+	Position.cpp,
+	Board.h,
+	Board.cpp,
+	GameState.h,
+	GameState.cpp,
+	MainWindow.h,
+	Mode.h,
+	Fields.iml,
+	MainWindow.cpp optimize_speed,
+	BoardArea.h,
+	MainWindow.lay;
+
+mainconfig
+	"" = "GUI SSE2";
+
