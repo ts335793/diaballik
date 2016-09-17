@@ -35,12 +35,11 @@ void MainWindow::FileMenu(Bar& bar)
 
 void MainWindow::Load()
 {
-	Cout() << "loudf sie robi\n";
 	if(!fs.ExecuteOpen())
 		return;
-	
+
 	numberOfGame++; //!
-	
+
 	turnsHistory = Vector<Move>();
 	FileIn f(~fs);
 	Serialize(f);
@@ -48,10 +47,9 @@ void MainWindow::Load()
 
 void MainWindow::Save()
 {
-	Cout() << "sejf sie robi\n";
 	if(!fs.ExecuteSaveAs())
 		return;
-	
+
 	FileOut f(~fs);
 	Serialize(f);
 }
@@ -81,32 +79,32 @@ MainWindow::MainWindow()
 {
 	CtrlLayout(*this, "Window title");
 	boardArea.WhenClicked << THISBACK(WhenBoardClicked);
-	
+
 	getHint << THISBACK(WhenGetHint);
 	applyMove << THISBACK(WhenApplyMove);
 	undoChanges << THISBACK(WhenUndoChanges);
-	
+
 	previousState << THISBACK(PreviousState);
 	nextState << THISBACK(NextState);
 	continueFromHere << THISBACK(ContinueFromHere);
 	goBackToTheFuture << THISBACK(GoBackToTheFuture);
-	
+
 	applyChanges << THISBACK(ApplyChanges);
 	dropChanges << THISBACK(DropChanges);
 	switchCurrentUser << THISBACK(WhenSwitchCurrentUser);
 	whiteSwitch << THISBACK1(SwitchPlayerType, WhitePawn);
 	blackSwitch << THISBACK1(SwitchPlayerType, BlackPawn);
-	
+
 	getHint.Hide();
 	applyMove.Hide();
 	undoChanges.Hide();
 	aboutGame.Hide();
-	
+
 	previousState.Hide();
 	nextState.Hide();
 	continueFromHere.Hide();
 	goBackToTheFuture.Hide();
-	
+
 	applyChanges.Hide();
 	dropChanges.Hide();
 	switchCurrentUser.Hide();
@@ -116,18 +114,18 @@ MainWindow::MainWindow()
 	blackSwitch.Hide();
 	whoIsCurrentPlayer.Hide();
 	editModeInfoLabel.Hide();
-	
+
 	NewGame(true, false);
 	countBallThrows = 0;
 	countPawnPulls = 0;
 	AddFrame(menu);
 	AddFrame(status);
 	menu.Set(THISBACK(MainMenu));
-	
+
 	numberOfGame = 0;
-	
+
 	RefreshBoard();
-	
+
 	menu.WhenHelp = status;
 	fs.Type("save files", "*.save")
 	  .DefaultExt("save");
@@ -135,86 +133,83 @@ MainWindow::MainWindow()
 
 void MainWindow::NewGame(bool whitePlayerIsHuman, bool blackPlayerIsHuman)
 {
-	Cout() << "Nowa gra\n";
 	numberOfGame++; // !
-	
+
 	UndoChanges(); // !
-	
+
 	this->isWhitePlayerHuman = whitePlayerIsHuman;
 	this->isBlackPlayerHuman = blackPlayerIsHuman;
-	
+
 	board = Board();
-	
+
 	for(int i = 0; i < PAWNS_QUANTITY; i++)
 	{
 		whitePlayerPawns[i] = Pawn(WhitePawn, Position(i, Board::HEIGHT - 1));
 		board.Set(whitePlayerPawns[i]);
 	}
-	
+
 	for(int i = 0; i < PAWNS_QUANTITY; i++)
 	{
 		blackPlayerPawns[i] = Pawn(BlackPawn, Position(i, 0));
 		board.Set(blackPlayerPawns[i]);
 	}
-	
+
 	whitePlayerPawns[PAWNS_QUANTITY / 2].GrabBall();
 	blackPlayerPawns[PAWNS_QUANTITY / 2].GrabBall();
-	
+
 	activePawnsColor = WhitePawn;
-	
+
 	turnsHistory = Vector<Move>();
-	
+
 	SwitchMode(GameMode);
 }
 
 void MainWindow::Serialize(Stream & stream)
 {
-	Cout() << "Serializacja\n";
-	
 	UndoChanges(); // !
-	
+
 	for(int i = 0; i < 7; i++)
 	{
 		stream % whitePlayerPawns[i];
 	}
-	
+
 	for(int i = 0; i < 7; i++)
 	{
 		stream % blackPlayerPawns[i];
 	}
-	
+
 	int tmp = (int) activePawnsColor;
 	stream % tmp % isWhitePlayerHuman % isBlackPlayerHuman % turnsHistory;
 	activePawnsColor = (PawnColor) tmp;
-	
+
 	board = Board();
-	
+
 	for(int i = 0; i < 7; i++)
 	{
 		board.Set(whitePlayerPawns[i]);
 		board.Set(blackPlayerPawns[i]);
 	}
-	
+
 	SwitchMode(GameMode);
 }
 
 void MainWindow::RefreshBoard()
 {
 	Size size = boardArea.GetSize();
-	//std::cout << "Rozmiar: " << size.cx << " " << size.cy << std::endl;
+
 	int fieldWidth = size.cx / 7;
 	int fieldHeight = size.cy / 7;
 	int ellipseSize = fieldWidth / 2;
 	int ballSize = ellipseSize - 10;
-	
+
 	DrawingDraw boardDraw(size);
-	
+
 	for(int y = 0; y < 7; y++)
 	{
 		for(int x = 0; x < 7; x++)
 		{
 			DrawingDraw fieldDraw(Size(fieldWidth, fieldHeight));
-			
+
 			if((x + y) % 2)
 			{
 				if(board.IsHighlighted(Position(x, y)))
@@ -237,7 +232,7 @@ void MainWindow::RefreshBoard()
 					fieldDraw.DrawImage(Size(fieldWidth, fieldHeight), IMAGECLASS::FieldB());
 				}
 			}
-			
+
 			if(!board.IsEmpty(Position(x, y)))
 			{
 				if(board.Get(Position(x, y)).GetColor() == WhitePawn)
@@ -268,7 +263,7 @@ void MainWindow::RefreshBoard()
 			boardDraw.DrawDrawing(x * fieldWidth, y * fieldHeight, fieldWidth, fieldHeight, fieldDraw.GetResult());
 		}
 	}
-	
+
 	boardArea = boardDraw.GetResult();
 }
 
@@ -291,8 +286,7 @@ void MainWindow::WhenBoardClicked(Point p, dword keyflags)
 					{
 						countPawnPulls ++;
 					}
-					std::cout << countBallThrows << " " << countPawnPulls << std::endl;
-					
+
 					SingleMove singleMove(markedPawnPosition, position);
 					currentMove.Add(singleMove);
 					ApplyMove(Move(singleMove));
@@ -346,7 +340,7 @@ void MainWindow::WhenBoardClicked(Point p, dword keyflags)
 void MainWindow::EndTurn()
 {
 	turnsHistory.Add(currentMove);
-	
+
 	if(activePawnsColor == WhitePawn)
 	{
 		activePawnsColor = BlackPawn;
@@ -356,9 +350,9 @@ void MainWindow::EndTurn()
 		activePawnsColor = WhitePawn;
 	}
 	ResetMoveInput();
-	
+
 	RefreshBoard();
-	
+
 	SetAboutGameText();
 	if(activePawnsColor == WhitePawn)
 	{
@@ -368,20 +362,16 @@ void MainWindow::EndTurn()
 	{
 		status.Temporary("Black player turn.");
 	}
-	
+
 	int oldNumberOfGame = this->numberOfGame;
-	//Cout() << "Gra: " << oldNumberOfGame << " " << this->numberOfGame << "\n";
-	
+
 	ProcessEvents(); // !
-	
-	Cout() << "Gra: " << this->numberOfGame << " " << oldNumberOfGame << "\n";
-	
+
 	if(this->numberOfGame != oldNumberOfGame || mode != GameMode)
 	{
-		//Cout() << "Zakonczona gra nr. " << oldNumberOfGame;
 		return;
 	}
-	
+
 	if(StateIsFinal())
 	{
 		if(PawnsReachedEnemiesLine(WhitePawn) || PawnsMadeLine(BlackPawn))
@@ -429,12 +419,12 @@ void MainWindow::EnterGameMode()
 	undoChanges.Show();
 	getHint.Show();
 	RefreshBoard();
-	
+
 	aboutGame.Show();
 	SetAboutGameText();
-	
+
 	RefreshBoard();
-	
+
 	if(activePawnsColor == WhitePawn)
 	{
 		status.Temporary("White player turn.");
@@ -443,16 +433,7 @@ void MainWindow::EnterGameMode()
 	{
 		status.Temporary("Black player turn.");
 	}
-	
-	/*int oldNumberOfGame = numberOfGame;
-	
-	ProcessEvents(); // !
-	
-	if(numberOfGame != oldNumberOfGame)
-	{
-		return;
-	}*/
-	
+
 	if(StateIsFinal())
 	{
 		if(PawnsReachedEnemiesLine(WhitePawn) || PawnsMadeLine(BlackPawn))
@@ -485,9 +466,9 @@ void MainWindow::SwitchMode(Mode m)
 	if(mode == GameMode) LeaveGameMode();
 	else if(mode == EditMode) LeaveEditMode();
 	else if(mode == HistoryMode) LeaveHistoryMode();
-	
+
 	mode = m;
-	
+
 	if(mode == GameMode) EnterGameMode();
 	else if(mode == EditMode) EnterEditMode();
 	else if(mode == HistoryMode) EnterHistoryMode();
@@ -513,7 +494,7 @@ void MainWindow::EnterHistoryMode()
 	goBackToTheFuture.Show();
 	positionInHistory = turnsHistory.GetCount() - 1;
 	historyModeActivePawnsColor = activePawnsColor;
-	
+
 	status.Temporary(String().Cat() << "State " << (positionInHistory + 2) << " out of " << (turnsHistory.GetCount() + 1) << ".");
 }
 
@@ -604,7 +585,6 @@ void MainWindow::ApplyChanges()
 {
 	if(PromptOKCancel("Are you sure?"))
 	{
-		//turnsHistory = Vector<Move>();
 		turnsHistory.Add(changes);
 		changes = Move();
 		SwitchMode(GameMode);
@@ -680,21 +660,16 @@ void MainWindow::WhenGetHint()
 		ApplyMove(currentMove);
 		RefreshBoard();
 		PromptOK("AI made move for you. To apply tap \"ApplyMove\" button.");
-		//PromptOK("Computer told that move: " + GenerateMove(activePawnsColor).ToString() + " is OK.");
 	}
 }
 
 void MainWindow::WhenSwitchCurrentUser()
 {
-	//if(PromptOKCancel("Are you sure?"))
-	//{
-		if(activePawnsColor == WhitePawn)
-			activePawnsColor = BlackPawn;
-		else
-			activePawnsColor = WhitePawn;
-		UpdateWhoIsCurrentPlayer();
-		//SwitchMode(GameMode);
-	//}
+	if(activePawnsColor == WhitePawn)
+		activePawnsColor = BlackPawn;
+	else
+		activePawnsColor = WhitePawn;
+	UpdateWhoIsCurrentPlayer();
 }
 
 GUI_APP_MAIN

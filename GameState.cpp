@@ -5,7 +5,7 @@
 Vector<SingleMove> GameState::GenerateMoves(const Pawn & pawn)
 {
 	Vector<SingleMove> output;
-	
+
 	if(pawn.HasBall())
 	{
 		int DX[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
@@ -43,7 +43,7 @@ Vector<SingleMove> GameState::GenerateMoves(const Pawn & pawn)
 			}
 		}
 	}
-		
+
 	return output;
 }
 
@@ -81,7 +81,7 @@ bool GameState::PawnsMadeLine(PawnColor pawnColor)
 		{
 			pawn = &blackPlayerPawns[i];
 		}
-		
+
 		if(pawn->GetPosition().GetX() != Board::WIDTH - 1)
 		{
 			bool foundPawn = false;
@@ -101,7 +101,7 @@ bool GameState::PawnsMadeLine(PawnColor pawnColor)
 			}
 		}
 	}
-	
+
 	int quantity = 0;
 	if(pawnColor == WhitePawn)
 	{
@@ -125,7 +125,7 @@ bool GameState::PawnsMadeLine(PawnColor pawnColor)
 			}
 		}
 	}
-	
+
 	return quantity >= 3;
 }
 
@@ -144,7 +144,7 @@ bool GameState::PawnsReachedEnemiesLine(PawnColor pawnColor)
 bool GameState::StateIsFinal()
 {
 	return PawnsReachedEnemiesLine(WhitePawn) || PawnsReachedEnemiesLine(BlackPawn) ||
-		PawnsMadeLine(WhitePawn) || PawnsMadeLine(BlackPawn); 
+		PawnsMadeLine(WhitePawn) || PawnsMadeLine(BlackPawn);
 }
 
 Move GameState::GenerateMove(PawnColor pawnColor)
@@ -157,7 +157,7 @@ Vector< Tuple2<Move, long long int> > GameState::GenerateMoves(PawnColor pawnCol
 {
 	Vector< Tuple2<Move, long long int> > result;
 	Pawn * pawns;
-	
+
 	if(pawnColor == WhitePawn)
 	{
 		pawns = whitePlayerPawns;
@@ -166,7 +166,7 @@ Vector< Tuple2<Move, long long int> > GameState::GenerateMoves(PawnColor pawnCol
 	{
 		pawns = blackPlayerPawns;
 	}
-	
+
 	bool threwBall = false;
 	for(int i = 0; i < PAWNS_QUANTITY; i++)
 	{
@@ -181,7 +181,7 @@ Vector< Tuple2<Move, long long int> > GameState::GenerateMoves(PawnColor pawnCol
 		for(int fit = 0; fit != firstPawnMoves.GetCount(); fit++)
 		{
 			ApplyMove(Move(firstPawnMoves[fit]));
-			
+
 			if(!PawnsMadeLine(pawnColor))
 			{
 				result.Add(MakeTuple(Move(firstPawnMoves[fit]), GetHash()));
@@ -212,7 +212,7 @@ Vector< Tuple2<Move, long long int> > GameState::GenerateMoves(PawnColor pawnCol
 							for(int k = j; k < PAWNS_QUANTITY; k++)
 							{
 								const Pawn & thirdPawn = pawns[k];
-								
+
 								if(threwBall && thirdPawn.HasBall())
 								{
 									continue;
@@ -256,7 +256,7 @@ Vector< Tuple2<Move, long long int> > GameState::GenerateMoves(PawnColor pawnCol
 			threwBall = false;
 		}
 	}
-	
+
 	return result;
 }
 
@@ -297,11 +297,11 @@ Tuple2<Move, int> GameState::AlphaBeta(const int & depth, int alpha, int beta, P
 	PawnColor waitingPawnsColor;
 	if(activePawnsColor == WhitePawn) waitingPawnsColor = BlackPawn;
 	else waitingPawnsColor = WhitePawn;
-	
+
 	PawnColor oppositePawnsColor;
 	if(pawnColor == WhitePawn) oppositePawnsColor = BlackPawn;
 	else oppositePawnsColor = WhitePawn;
-	
+
 	if(StateIsFinal())
 	{
 		if(PawnsReachedEnemiesLine(activePawnsColor) || PawnsMadeLine(waitingPawnsColor))
@@ -323,16 +323,9 @@ Tuple2<Move, int> GameState::AlphaBeta(const int & depth, int alpha, int beta, P
 		{
 			Vector< Tuple2<Move, long long int> > moves = GenerateMoves(pawnColor);
 			Move bestMove = moves[0].a;
-			
-			//std::cout << "Przed " << moves.size() << " ";
-			//std::sort(moves.begin(), moves.end(), MoveHashPairComparator);
-			//Vector< Tuple2<Move, long long int> >::Iterator it = std::unique(moves.begin(), moves.end(), MoveHashPairEqual);
-			//while(moves.End() != it)
-			//	moves.Pop();
+
 			std::random_shuffle(moves.begin(), moves.end());
-			
-			//std::cout << "Po " << moves.size() << std::endl;
-			//Cout() << moves.GetCount() << '\n';
+
 			for(int it = 0; it != moves.GetCount(); it++)
 			{
 				ApplyMove(moves[it].a);
@@ -356,15 +349,8 @@ Tuple2<Move, int> GameState::AlphaBeta(const int & depth, int alpha, int beta, P
 			Vector< Tuple2<Move, long long int> > moves = GenerateMoves(pawnColor);
 			Move bestMove = moves[0].a;
 
-			//std::cout << "Przed " << moves.size() << " ";
-			//std::sort(moves.begin(), moves.end(), MoveHashPairComparator);
-			//Vector< Tuple2<Move, long long int> >::Iterator it = std::unique(moves.begin(), moves.end(), MoveHashPairEqual);
-			//while(moves.End() != it)
-			//	moves.Pop();
 			std::random_shuffle(moves.begin(), moves.end());
-			
-			//std::cout << "Po " << moves.size() << std::endl;
-			//Cout() << moves.GetCount() << '\n';
+
 			for(int it = 0; it != moves.GetCount(); it++)
 			{
 				ApplyMove(moves[it].a);
